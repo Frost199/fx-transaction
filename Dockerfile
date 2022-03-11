@@ -6,6 +6,7 @@ LABEL maintainer="Eleam Emmanuel"
 # set scripts path in env
 ENV PATH="/scripts:${PATH}"
 
+#RUN apk add --no-cache bash
 RUN apk add --update --virtual \
       runtime-deps \
       postgresql-client \
@@ -32,10 +33,6 @@ RUN chmod +x /scripts/*
 ENV BUNDLE_PATH /gems
 RUN bundle install
 
-# create a user that will run the application using docker
-RUN adduser -D Emmanuel
-USER Emmanuel
-
-CMD [ "entrypoint.sh" ]
+ENTRYPOINT [ "entrypoint.sh" ]
 EXPOSE 3000
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]

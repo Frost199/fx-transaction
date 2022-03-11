@@ -5,7 +5,9 @@ services:
     restart: always
     container_name: fx-transactions-database
     environment:
-      - POSTGRES_PASSWORD=password
+      POSTGRES_USER: "fx_transaction_admin"
+      POSTGRES_DB: "fx_transactions"
+      POSTGRES_PASSWORD: "password"
     ports:
       - "5438:5432"
     volumes:
@@ -16,7 +18,9 @@ services:
     restart: always
     container_name: fx-transactions-test-database
     environment:
-      - POSTGRES_PASSWORD=password
+      POSTGRES_USER: "fx_transaction_admin"
+      POSTGRES_DB: "fx_transactions_test"
+      POSTGRES_PASSWORD: "password"
     ports:
       - "5439:5432"
     volumes:
@@ -24,6 +28,7 @@ services:
 
   redis:
     image: redis:latest
+    restart: always
     ports:
       - "6382:6379"
 
@@ -31,6 +36,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "3000:3000"
     container_name: fx-transactions-service
@@ -39,10 +45,15 @@ services:
       - fx-transactions-test-database
       - redis
     environment:
-      - DATABASE_URL=postgres://postgres:password@fx-transactions-database:5432/postgres
-      - TEST_DATABASE_URL=postgres://postgres:password@fx-transactions-test-database:5432/postgres
-      - REDIS_URL=redis://redis:6379
-      - RAILS_ENV=development
+      FX_TRANSACTION_DATABASE: "fx_transactions"
+      FX_TRANSACTION_DATABASE_USER: "fx_transaction_admin"
+      FX_TRANSACTION_DATABASE_PASSWORD: "password"
+      FX_TRANSACTION_DATABASE_HOST: "fx-transactions-database"
+      FX_TRANSACTION_TEST_DATABASE: "fx_transactions_test"
+      FX_TRANSACTION_TEST_DATABASE_USER: "fx_transaction_admin"
+      FX_TRANSACTION_TEST_DATABASE_PASSWORD: "password"
+      FX_TRANSACTION_TEST_DATABASE_HOST: "fx-transactions-test-database"
+      REDIS_URL: "redis://redis:6379"
     volumes:
       - .:/app
 

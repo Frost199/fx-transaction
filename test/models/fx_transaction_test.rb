@@ -2,7 +2,7 @@ require "test_helper"
 
 class FxTransactionTest < ActiveSupport::TestCase
   test 'transaction should be valid' do
-    fx_transaction = FxTransaction.create(
+    fx_transaction = FxTransaction.new(
       customer_id: 1,
       input_amount: 9.99,
       transaction_id: 4,
@@ -39,17 +39,17 @@ class FxTransactionTest < ActiveSupport::TestCase
   end
 
   test 'transaction with taken transaction_id should be invalid' do
-    fx_transaction = FxTransaction.create(
+    other_transaction = fx_transactions(:one)
+    fx_transaction = FxTransaction.new(
       customer_id: 1,
-      transaction_id: 2,
+      transaction_id: other_transaction.transaction_id,
       input_amount: 9.99,
       input_currency: 'ngn',
       output_amount: 9.99,
       output_currency: 'ngn',
       transaction_date: Time.zone.now
     )
-    duplicate_item = fx_transaction.dup
-    assert_not duplicate_item.valid?
+    assert_not fx_transaction.valid?
   end
 
   test 'transaction should not be valid if the transaction date is in the future' do

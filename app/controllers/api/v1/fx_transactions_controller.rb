@@ -3,6 +3,7 @@
 module Api
   module V1
     class FxTransactionsController < ApplicationController
+      before_action :fx_transaction, only: [:show, :update]
       include Paginable
 
       def index
@@ -21,13 +22,23 @@ module Api
       end
 
       def show
-        @fx_transaction = FxTransaction.find_by(transaction_id: params[:id])
         raise CustomErrors::NotFound.new(url_path: api_v1_fx_transaction_path) if @fx_transaction.nil?
 
         render json: FxTransactionSerializer.new(@fx_transaction).serializable_hash, status: :ok
       end
 
+      def update
+        @fx_transaction.update!(fx_transaction_params)
+        render json: FxTransactionSerializer.new(@fx_transaction).serializable_hash, status: :ok
+      rescue ActiveRecord::RecordInvalid
+        raise CustomErrors::Invalid.new(errors: @fx_transaction.errors.to_hash)
+      end
+
       private
+
+      def fx_transaction
+        @fx_transaction = FxTransaction.find_by(transaction_id: params[:id])
+      end
 
       # Only allow a trusted parameter "white list" through.
       def fx_transaction_params

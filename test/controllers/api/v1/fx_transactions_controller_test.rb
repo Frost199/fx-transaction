@@ -46,4 +46,36 @@ class Api::V1::FxTransactionsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :created
   end
+
+  test 'should update fx transaction' do
+    # other_transaction = @fx_transaction
+    fx_transaction = create_transaction
+    assert_changes('fx_transaction') do
+      put api_v1_fx_transaction_url(fx_transaction), params: {
+        fx_transaction: {
+          customer_id: 1,
+          transaction_id: 4,
+          input_amount: 100.222,
+          input_currency: 'cad',
+          output_amount: 12.02,
+          output_currency: 'ngn',
+          transaction_date: Time.zone.now
+        }
+      }, as: :json
+    end
+    # new_transaction = fx_transactions(:one)
+    # assert_not_equal other_transaction.input_currency, new_transaction.input_currency
+  end
+
+  def create_transaction
+    FxTransaction.create(
+      customer_id: 1,
+      input_amount: 9.99,
+      transaction_id: 4,
+      input_currency: 'ngn',
+      output_amount: 9.99,
+      output_currency: 'ngn',
+      transaction_date: Time.zone.now
+    )
+  end
 end
